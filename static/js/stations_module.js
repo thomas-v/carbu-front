@@ -1,34 +1,37 @@
 // Page stations
 
-// coordonnees par default
-let latitude = 48.852969;
-let longitude = 2.349903;
+// Fonction de geocodage
+function geocode(){
+    // coordonnees par default
+    let latitude = 48.852969;
+    let longitude = 2.349903;
 
-var options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0
-};
+    var options = {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0
+    };
 
-function success(pos) {
-    console.log(pos);
-    var crd = pos.coords;
+    function success(pos) {
+        console.log(pos);
+        var crd = pos.coords;
 
-    console.log('Votre position actuelle est :');
-    console.log(`Latitude : ${crd.latitude}`);
-    console.log(`Longitude : ${crd.longitude}`);
-    console.log(`La précision est de ${crd.accuracy} mètres.`);
+        console.log('Votre position actuelle est :');
+        console.log(`Latitude : ${crd.latitude}`);
+        console.log(`Longitude : ${crd.longitude}`);
+        console.log(`La précision est de ${crd.accuracy} mètres.`);
 
-    initMap(crd.latitude, crd.longitude);
+        initMap(crd.latitude, crd.longitude);
+    }
+
+    function error(err) {
+        console.warn(`ERREUR (${err.code}): ${err.message}`);
+        initMap(latitude, longitude);
+    }
+
+    // geolocalisation
+    navigator.geolocation.getCurrentPosition(success, error, options);
 }
-
-function error(err) {
-    console.warn(`ERREUR (${err.code}): ${err.message}`);
-    initMap(latitude, longitude);
-}
-
-// geolocalisation
-navigator.geolocation.getCurrentPosition(success, error, options);
 
 // Fonction d'initialisation de la carte
 function initMap(lat, lon) {
@@ -42,3 +45,7 @@ function initMap(lat, lon) {
         maxZoom: 18
     }).addTo(macarte);
 }
+
+$( document ).ready(function() {
+    geocode();
+});
