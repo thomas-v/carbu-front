@@ -22,10 +22,15 @@ let geocode = (latitude, longitude) => {
     });
 }
 
-// Recuperation du code postal de la geoloc actuelle
-let getDpt = async (latitude, longitude) => {
+// Recuperation d'un département d'un code postal
+let getDpt = (postCode) => {
+    return postCode.substr(0,2);
+}
+
+// Recuperation du département de la geoloc actuelle
+let getDptByCoords = async (latitude, longitude) => {
     let geocode_value = await geocode(latitude, longitude);
-    return geocode_value.address.postcode.substr(0,2);
+    return await getDpt(geocode_value.address.postcode);
 }
 
 let getStationsByDpt = (dpt) => {
@@ -73,10 +78,10 @@ $( document ).ready(async () => {
     let map = await initMap(latitude, longitude);
 
     // recuperation de la ville
-    let postCode = await getDpt(latitude, longitude);
+    let dept = await getDptByCoords(latitude, longitude);
     
     // on recupere la liste des stations services de la ville
-    let stations = await getStationsByDpt(postCode);
+    let stations = await getStationsByDpt(dept);
     stations = JSON.parse(stations);
     
     let markers = await insertStationsMarkers(stations, map);
@@ -85,5 +90,19 @@ $( document ).ready(async () => {
     $("#searchButton").click(async function() {
         //clean des marqueurs 
         markers.clearLayers();
+
+        //recuperation du code postal
+        let postCode = $("#cp").val();
+
+        let dpt = getDpt(postCode);
+        console.log(dept);
+        
+        // on recupere la liste des stations services de la ville
+        let stations = await getStationsByDpt(dpt);
+        stations = JSON.parse(stations);
+        
+        let newMarkers = await insertStationsMarkers(stations, map);
+
+        //zoom sur la nouvelle zone
     });
 });
