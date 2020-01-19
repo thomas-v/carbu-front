@@ -34,6 +34,24 @@ let getStationsByDpt = (dpt) => {
     });
 }
 
+// Insertion des marqueurs des stations + infos des carburants
+let insertStationsMarkers = (stations, map) => {
+
+    let layerGroup = L.layerGroup().addTo(map);
+
+    // on parcourt les stations pour recuperer les coordonnees
+    for(let i = 0; i < stations.length; i++){
+        let carb_list = `${stations[i]['adresse']} <br> ${stations[i]['cp']} ${stations[i]['ville']} <br><br>`;
+        for(const carburant in stations[i]['carburants']){
+            carb_list = carb_list + `<b>${carburant}</b>: ${stations[i]['carburants'][carburant]} € <br>`;
+        }
+        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).addTo(layerGroup);
+        marker.bindPopup(carb_list);
+    }
+
+    return layerGroup;
+}
+
 $( document ).ready(async () => {
 
     //coordonees
@@ -61,16 +79,11 @@ $( document ).ready(async () => {
     let stations = await getStationsByDpt(postCode);
     stations = JSON.parse(stations);
     
-    // on parcourt les stations pour recuperer les coordonnees
-    for(let i = 0; i < stations.length; i++){
-        let carb_list = '';
-        for(const carburant in stations[i]['carburants']){
-            carb_list = carb_list + `<b>${carburant}</b>: ${stations[i]['carburants'][carburant]} <br>`;
-        }
-        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).addTo(map);
-        marker.bindPopup(carb_list);
-    }
-
-    //L.marker([latitude, longitude]).addTo(map);
-
+    let markers = await insertStationsMarkers(stations, map);
+    
+    // Recherche par code postal
+    $("#searchButton").click(async function() {
+        //clean des marqueurs 
+        markers.clearLayers();
+    });
 });

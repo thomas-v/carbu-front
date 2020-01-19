@@ -2,6 +2,10 @@
 
 /* carte */
 #map{
-    margin-top:100px;
+    margin-top:10px;
     height:700px;
+}
+
+.searchCity{
+    margin-top:100px;
 }
