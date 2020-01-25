@@ -35,7 +35,13 @@ let getDptByCoords = async (latitude, longitude) => {
 
 let getStationsByDpt = (dpt) => {
     return new Promise(function (resolve, reject) {
-        $.get('https://thomasdev.ovh/api/stations/' + dpt, resolve);
+        $.get('https://thomasdev.ovh/api/stationsByDpt/' + dpt, resolve);
+    });
+}
+
+let getStationsByPostCode = (postCode) => {
+    return new Promise(function (resolve, reject) {
+        $.get('https://thomasdev.ovh/api/stationsByPostCode/' + postCode, resolve);
     });
 }
 
@@ -86,7 +92,7 @@ $( document ).ready(async () => {
     
     let markers = await insertStationsMarkers(stations, map);
     
-    // Recherche par code postal
+    // Recherche par code postal 
     $("#searchButton").click(async function() {
         //clean des marqueurs 
         markers.clearLayers();
@@ -101,8 +107,13 @@ $( document ).ready(async () => {
         let stations = await getStationsByDpt(dpt);
         stations = JSON.parse(stations);
         
-        let newMarkers = await insertStationsMarkers(stations, map);
+        markers = await insertStationsMarkers(stations, map);
 
         //zoom sur la nouvelle zone
+        let newCoords = await getStationsByPostCode(postCode);
+        newCoords = JSON.parse(newCoords);
+        console.log(newCoords);
+
+        map.panTo(new L.LatLng(newCoords['latitude'], newCoords['longitude']));
     });
 });
