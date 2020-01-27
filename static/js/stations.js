@@ -33,9 +33,9 @@ let getDptByCoords = async (latitude, longitude) => {
     return await getDpt(geocode_value.address.postcode);
 }
 
-let getStationsByDpt = (dpt) => {
+let getStationsByDpt = (dpt, postCode) => {
     return new Promise(function (resolve, reject) {
-        $.get('https://thomasdev.ovh/api/stationsByDpt/' + dpt, resolve);
+        $.get('https://thomasdev.ovh/api/stationsByDpt/' + dpt + '/' + postCode, resolve);
     });
 }
 
@@ -63,16 +63,34 @@ let insertStationsMarkers = (stations, map) => {
     return layerGroup;
 }
 
+// on alimente le tableau
+let feedingArray = (markers) => {
+    let markersInfo = markers.getLayers();
+
+    // on clean le tableau
+    $("#infos").children().remove();
+
+    for(let i = 0; i < markersInfo.length; i++){
+        let infos = markersInfo[i]._popup._content;
+        infos = `<div class="stations_infos" id="${i}">${infos}</div>`;
+        $('#infos').append(infos);
+    }
+}
+
 $( document ).ready(async () => {
 
     //coordonees
     let latitude = false;
     let longitude = false;
+    let postCode = false;
 
     try{
         const position = await geoloc();
         latitude = position.coords.latitude;
         longitude = position.coords.longitude;
+        let geocode_value = await geocode(latitude, longitude);
+        postCode = geocode_value.address.postcode;
+        console.log(postCode);
     }
     catch (err) {
         latitude = 48.852969;
@@ -87,7 +105,7 @@ $( document ).ready(async () => {
     let dept = await getDptByCoords(latitude, longitude);
     
     // on recupere la liste des stations services de la ville
-    let stations = await getStationsByDpt(dept);
+    let stations = await getStationsByDpt(dept, postCode);
     stations = JSON.parse(stations);
     
     let markers = await insertStationsMarkers(stations, map);
@@ -101,10 +119,9 @@ $( document ).ready(async () => {
         let postCode = $("#cp").val();
 
         let dpt = getDpt(postCode);
-        console.log(dept);
         
         // on recupere la liste des stations services de la ville
-        let stations = await getStationsByDpt(dpt);
+        let stations = await getStationsByDpt(dpt, postCode);
         stations = JSON.parse(stations);
         
         markers = await insertStationsMarkers(stations, map);
@@ -112,8 +129,15 @@ $( document ).ready(async () => {
         //zoom sur la nouvelle zone
         let newCoords = await getStationsByPostCode(postCode);
         newCoords = JSON.parse(newCoords);
-        console.log(newCoords);
-
         map.panTo(new L.LatLng(newCoords['latitude'], newCoords['longitude']));
+
+        /*console.log(markers.getLayers());
+        console.log(markers.getLayers()[0]._popup._content);
+        markers.getLayers()[0].openPopup();*/
+
+        await feedingArray(markers);
     });
+
+    await feedingArray(markers);
+    
 });
