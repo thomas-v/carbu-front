@@ -112,6 +112,8 @@ $( document ).ready(async () => {
     
     let markers = await insertStationsMarkers(stations, map);
     
+    await feedingArray(markers);
+
     // Recherche par code postal 
     $("#searchButton").click(async function() {
         //clean des marqueurs 
@@ -140,6 +142,8 @@ $( document ).ready(async () => {
         await feedingArray(markers);
     });
 
-    await feedingArray(markers);
+    $("#infos a").click(function (event) {
+        markers.getLayers()[event.target.id].openPopup();
+    });
     
 });
