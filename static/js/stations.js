@@ -79,6 +79,14 @@ let feedingArray = (markers) => {
     }
 }
 
+let listToMarker = (markers) => {
+    $("#infos a").click(function (event) {
+        $("#infos>a.active").removeClass("active");
+        $(this).addClass('active');
+        markers.getLayers()[event.target.id].openPopup();
+    });
+}
+
 $( document ).ready(async () => {
 
     //coordonees
@@ -92,7 +100,6 @@ $( document ).ready(async () => {
         longitude = position.coords.longitude;
         let geocode_value = await geocode(latitude, longitude);
         postCode = geocode_value.address.postcode;
-        console.log(postCode);
     }
     catch (err) {
         latitude = 48.852969;
@@ -113,6 +120,8 @@ $( document ).ready(async () => {
     let markers = await insertStationsMarkers(stations, map);
     
     await feedingArray(markers);
+
+    await listToMarker(markers);
 
     // Recherche par code postal 
     $("#searchButton").click(async function() {
@@ -135,15 +144,8 @@ $( document ).ready(async () => {
         newCoords = JSON.parse(newCoords);
         map.panTo(new L.LatLng(newCoords['latitude'], newCoords['longitude']));
 
-        /*console.log(markers.getLayers());
-        console.log(markers.getLayers()[0]._popup._content);
-        markers.getLayers()[0].openPopup();*/
-
         await feedingArray(markers);
+        
+        await listToMarker(markers);
     });
-
-    $("#infos a").click(function (event) {
-        markers.getLayers()[event.target.id].openPopup();
-    });
-    
 });
