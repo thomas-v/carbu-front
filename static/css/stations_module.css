@@ -11,14 +11,11 @@
 }
 
 #infos{
-    background-color: #EEEEEE;
     height:700px;
     overflow:auto;
 }
 
 .stations_infos{
-    padding-top:10px;
-    border-bottom: 1px solid black;
-    padding-bottom: 10px;
     cursor:pointer;
+    width:100%;
 }

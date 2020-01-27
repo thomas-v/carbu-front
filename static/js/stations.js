@@ -72,8 +72,10 @@ let feedingArray = (markers) => {
 
     for(let i = 0; i < markersInfo.length; i++){
         let infos = markersInfo[i]._popup._content;
-        infos = `<div class="stations_infos" id="${i}">${infos}</div>`;
-        $('#infos').append(infos);
+        let address = infos.split('<br><br>')[0];
+
+        address = `<a class="list-group-item list-group-item-action stations_infos" id="${i}">${address}</a>`;
+        $('#infos').append(address);
     }
 }
 
