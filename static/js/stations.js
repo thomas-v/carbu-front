@@ -59,10 +59,10 @@ let insertStationsMarkers = (stations, map) => {
         for(const carburant in stations[i]['carburants']){
             carb_list = carb_list + `<b>${carburant}</b>: ${stations[i]['carburants'][carburant]} € <br>`;
         }
-        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).on('click', (a) => {console.log(a)}).addTo(layerGroup);
+        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).addTo(layerGroup);
         marker.bindPopup(carb_list);
 
-        address = `<a class="list-group-item list-group-item-action stations_infos" id="${marker._leaflet_id}">${address}</a>`;
+        address = `<a class="list-group-item list-group-item-action stations_infos" id="${i}">${address}</a>`;
         $('#infos').append(address);
     }
 
