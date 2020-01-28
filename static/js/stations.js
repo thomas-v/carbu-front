@@ -51,38 +51,26 @@ let insertStationsMarkers = (stations, map) => {
     let layerGroup = L.layerGroup().addTo(map);
 
     // on parcourt les stations pour recuperer les coordonnees
+    // on clean le tableau
+    $(".stations_infos").remove();
     for(let i = 0; i < stations.length; i++){
+        let address = stations[i]['adresse'] +'<br>'+ stations[i]['cp'] + ' ' + stations[i]['ville'];
         let carb_list = `${stations[i]['adresse']} <br> ${stations[i]['cp']} ${stations[i]['ville']} <br><br>`;
         for(const carburant in stations[i]['carburants']){
             carb_list = carb_list + `<b>${carburant}</b>: ${stations[i]['carburants'][carburant]} € <br>`;
         }
-        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).addTo(layerGroup);
+        let marker = L.marker([stations[i]['latitude'], stations[i]['longitude']]).on('click', (a) => {console.log(a)}).addTo(layerGroup);
         marker.bindPopup(carb_list);
+
+        address = `<a class="list-group-item list-group-item-action stations_infos" id="${marker._leaflet_id}">${address}</a>`;
+        $('#infos').append(address);
     }
 
     return layerGroup;
 }
 
-// on alimente le tableau
-let feedingArray = (markers) => {
-    let markersInfo = markers.getLayers();
-
-    // on clean le tableau
-    $("#infos").children().remove();
-
-    for(let i = 0; i < markersInfo.length; i++){
-        let infos = markersInfo[i]._popup._content;
-        let address = infos.split('<br><br>')[0];
-
-        address = `<a class="list-group-item list-group-item-action stations_infos" id="${i}">${address}</a>`;
-        $('#infos').append(address);
-    }
-}
-
 let listToMarker = (markers) => {
     $("#infos a").click(function (event) {
-        $("#infos>a.active").removeClass("active");
-        $(this).addClass('active');
         markers.getLayers()[event.target.id].openPopup();
     });
 }
@@ -119,7 +107,6 @@ $( document ).ready(async () => {
     
     let markers = await insertStationsMarkers(stations, map);
     
-    await feedingArray(markers);
 
     await listToMarker(markers);
 
@@ -144,7 +131,6 @@ $( document ).ready(async () => {
         newCoords = JSON.parse(newCoords);
         map.panTo(new L.LatLng(newCoords['latitude'], newCoords['longitude']));
 
-        await feedingArray(markers);
         
         await listToMarker(markers);
     });
